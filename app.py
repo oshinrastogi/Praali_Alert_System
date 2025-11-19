@@ -3,14 +3,14 @@ import pandas as pd
 import joblib
 import os
 
-# --- Page Configuration ---
+# Page Configuration
 st.set_page_config(
     page_title="Prali Fire Prediction",
     page_icon="🔥",
     layout="wide"
 )
 
-# --- Model Loading ---
+# Model Loading 
 MODEL_FILE = 'prali_fire_model.pkl'
 
 @st.cache_resource
@@ -31,8 +31,7 @@ def load_model(model_path):
 # Load the model
 model_pipeline = load_model(MODEL_FILE)
 
-# --- Feature Definitions ---
-# These must match the columns your model was trained on
+# Feature Definitions 
 NEW_NUMERIC_FEATURES = [
     'brightness', 'scan', 'track', 'confidence', 'bright_t31', 
     'frp', 'type', 'acq_hour'
@@ -70,7 +69,7 @@ inputs['acq_hour'] = st.sidebar.slider("Hour of Day (0-23)", min_value=0, max_va
 
 # --- Categorical Inputs ---
 st.sidebar.subheader("Categorical Features")
-inputs['satellite'] = st.sidebar.selectbox("Satellite", ['N20', 'Aqua', 'Terra']) # Add others if you know them
+inputs['satellite'] = st.sidebar.selectbox("Satellite", ['N20', 'Aqua', 'Terra']) 
 inputs['instrument'] = st.sidebar.selectbox("Instrument", ['VIIRS', 'MODIS'])
 inputs['daynight'] = st.sidebar.selectbox("Day or Night", ['D', 'N'])
 
@@ -78,12 +77,10 @@ inputs['daynight'] = st.sidebar.selectbox("Day or Night", ['D', 'N'])
 # --- Main Page for Prediction ---
 st.header("Model Prediction")
 
-# Create a button to run the prediction
 if st.button("Predict Likelihood", type="primary"):
-    # 1. Collect inputs into a DataFrame
+
     input_df = pd.DataFrame([inputs])
     
-    # 2. Re-order columns to match model's expected input
     try:
         input_df = input_df[ALL_FEATURES]
     except KeyError as e:
@@ -93,7 +90,6 @@ if st.button("Predict Likelihood", type="primary"):
     st.subheader("Input Data:")
     st.dataframe(input_df)
 
-    # 3. Make predictions
     try:
         # Predict class (0 or 1)
         prediction = model_pipeline.predict(input_df)
@@ -104,7 +100,7 @@ if st.button("Predict Likelihood", type="primary"):
         prali_probability = probabilities[0][1] # Probability of class 1
         predicted_class = prediction[0]
 
-        # 4. Display results
+        # Display results
         st.subheader("Results")
         col1, col2 = st.columns(2)
 

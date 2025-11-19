@@ -13,10 +13,9 @@ from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.neighbors import KNeighborsClassifier
 
-# XGBoost + LightGBM (optional)
+# XGBoost + LightGBM
 from xgboost import XGBClassifier
 from lightgbm import LGBMClassifier
-
 import seaborn as sns
 import matplotlib.pyplot as plt
 from tabulate import tabulate
@@ -44,7 +43,7 @@ train_df_processed = preprocess_features(train_df)
 #Define base feature sets
 new_numeric_features = [
     'brightness', 'scan', 'track', 'confidence', 'bright_t31', 
-    'frp', 'type', 'acq_hour'
+    'frp', 'type', 'acq_hour', 
 ]
 
 new_categorical_features = [
@@ -61,7 +60,7 @@ plt.tight_layout()
 plt.savefig("feature_correlation_heatmap.png")
 print("Saved 'feature_correlation_heatmap.png'")
 
-# Select features based on correlation...
+# Select features based on correlation
 print("\nSelecting Features Based on Correlation...")
 corr_matrix_abs = corr_matrix.abs()
 upper = corr_matrix_abs.where(np.triu(np.ones(corr_matrix_abs.shape), k=1).astype(bool))
@@ -98,9 +97,6 @@ preprocessor = ColumnTransformer(
     ]
 )
 
-# ----------------------------------------------------
-# 🔥 TRAIN MULTIPLE MODELS (EXPANDED LIST ADDED HERE)
-# ----------------------------------------------------
 print("\nTraining Multiple Models...")
 
 models = {
@@ -115,7 +111,6 @@ models = {
     "XGBoost": XGBClassifier(eval_metric='logloss', use_label_encoder=False),
     "LightGBM": LGBMClassifier()
 }
-# ----------------------------------------------------
 
 results = []
 for name, clf in models.items():
@@ -128,7 +123,7 @@ for name, clf in models.items():
 print("\n--- Model Comparison Results ---")
 print(tabulate(results, headers=["Model", "Validation Accuracy"], tablefmt="grid"))
 
-# Choose best model ---
+# Choose best model 
 best_model_name = max(results, key=lambda x: float(x[1]))[0]
 print(f"\nBest base model: {best_model_name}")
 
@@ -172,6 +167,6 @@ test_acc = accuracy_score(y_test, y_pred_test)
 print(f"Test Accuracy: {test_acc:.4f}")
 print("Classification Report:\n", classification_report(y_test, y_pred_test))
 
-# Save model ---
+# Save the best model
 joblib.dump(best_pipeline, 'prali_fire_model.pkl')
 print("\nSaved best tuned model as 'prali_fire_model.pkl'")
